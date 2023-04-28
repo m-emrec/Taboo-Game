@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, unused_local_variable, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:taboo/utils/settings_sheet.dart';
 import 'package:taboo/utils/timer_box.dart';
 
 import '../utils/words_card.dart';

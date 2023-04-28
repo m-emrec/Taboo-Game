@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:taboo/pages/end_screen.dart';
 import 'package:taboo/pages/game_page.dart';
 import 'package:taboo/pages/home_page.dart';
+import 'package:taboo/provider/game_provider.dart';
 import 'package:taboo/theme/theme_constants.dart';
 
 void main() {
@@ -25,14 +28,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Taboo',
-      theme: appTheme,
-      routes: {
-        "/": (ctx) => const HomePage(),
-        GamePage.routeName: (context) => GamePage(),
-      },
+    return ChangeNotifierProvider(
+      create: (context) => Game(),
+      builder: (context, child) => MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Taboo',
+        theme: appTheme,
+        routes: {
+          "/": (ctx) => const HomePage(),
+          GamePage.routeName: (context) => GamePage(),
+          EndScreen.routeName:(context) => const EndScreen(),
+        },
+      ),
     );
   }
 }

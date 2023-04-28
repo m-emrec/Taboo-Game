@@ -1,9 +1,12 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:taboo/extensions/extensions.dart';
+import 'package:provider/provider.dart';
+import 'package:taboo/logger.dart';
+import 'package:taboo/pages/end_screen.dart';
+import 'package:taboo/provider/game_provider.dart';
 
 class TimerBox extends StatefulWidget {
   const TimerBox({super.key});
@@ -13,6 +16,40 @@ class TimerBox extends StatefulWidget {
 }
 
 class _TimerBoxState extends State<TimerBox> {
+  late Timer _timer;
+  late int _remainingTime;
+  late int _duration;
+
+  void _startTimer(int duration, DateTime startTime) {
+    _timer = Timer.periodic(
+      Duration(seconds: 1),
+      (timer) {
+        var elapsedTime = DateTime.now().difference(startTime);
+
+        setState(
+          () {
+            _remainingTime = _duration - elapsedTime.inSeconds;
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final DateTime startTime = DateTime.now();
+    _duration = Provider.of<Game>(context, listen: false).gameDuration;
+    _remainingTime = _duration;
+    _startTimer(_duration, startTime);
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -24,33 +61,41 @@ class _TimerBoxState extends State<TimerBox> {
               height: 20,
               width: MediaQuery.of(context).size.width,
               color: Theme.of(context).cardColor.withOpacity(0.5),
-              child: const FractionallySizedBox(
-                alignment: Alignment.topLeft,
-                widthFactor: 0.4,
-                child: ColoredBox(
-                  color: Colors.red,
+              child: FractionallySizedBox(
+                alignment: Alignment.topRight,
+                widthFactor: _remainingTime / _duration,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurple.shade500,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
                 ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-              child: CircleAvatar(
-                backgroundColor: Theme.of(context).cardColor,
-                foregroundColor: Colors.white,
-                radius: 25,
-                child: Row(
-                  children: const [
-                    Icon(Icons.timer_outlined),
-                    SizedBox(
-                      width: 1,
+              child: Material(
+                elevation: 5,
+                shape: CircleBorder(),
+                child: CircleAvatar(
+                  backgroundColor: Theme.of(context).cardColor,
+                  foregroundColor: Colors.white,
+                  radius: 25,
+                  child: FittedBox(
+                    child: Row(
+                      children: [
+                        Icon(Icons.timer_outlined),
+                        Padding(
+                          padding: const EdgeInsets.all(1.0),
+                          child: Text(
+                            "$_remainingTime",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      "15",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                  ),
                 ),
-                // radius: 10,
               ),
             ),
           ],
