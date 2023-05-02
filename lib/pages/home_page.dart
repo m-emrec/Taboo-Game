@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taboo/pages/game_page.dart';
-import 'package:taboo/utils/game_settings_sheet.dart';
+import 'package:taboo/utils/start_game_sheet.dart';
 
 import '../utils/settings_sheet.dart';
 
@@ -24,6 +24,7 @@ class HomePage extends StatelessWidget {
                 width: screenWidth * 0.8,
                 height: screenHeight * 0.4,
                 child: Card(
+                  elevation: 5,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -49,10 +50,9 @@ class HomePage extends StatelessWidget {
                         width: screenWidth * 0.6,
                         child: ElevatedButton(
                           onPressed: () => showModalBottomSheet(
-                            
                               backgroundColor: Colors.transparent,
                               context: context,
-                              builder: (_) => const GameSettingsSheet()),
+                              builder: (_) => StartGameSheet()),
                           child: const Text("Başla"),
                         ),
                       ),
@@ -62,7 +62,6 @@ class HomePage extends StatelessWidget {
                         width: screenWidth * 0.6,
                         child: ElevatedButton(
                           onPressed: () => showModalBottomSheet(
-
                               backgroundColor: Colors.transparent,
                               context: context,
                               builder: (_) => const SettingSheet()),

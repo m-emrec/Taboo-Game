@@ -106,16 +106,7 @@ class Game extends ChangeNotifier {
         }
     ]
   */
-  final List<Map> _teamList = [
-    {
-      "teamName": "Green Team",
-      "teamScore": 10,
-    },
-    {
-      "teamName": "Yellow Team",
-      "teamScore": 25,
-    }
-  ];
+  List<Map> _teamList = [];
 
   late final int _teamCount;
 
@@ -130,6 +121,20 @@ class Game extends ChangeNotifier {
   //------------------- end of getters
 
   // ------------- functions
+
+  void addTeam(String teamName) {
+    _teamList.add(
+      {
+        "teamName": teamName,
+        "teamScore": 0,
+      },
+    );
+    logger.i(_teamList);
+  }
+
+  void resetGame() {
+    _teamList = [];
+  }
 
   void shuffleWords() {
     _words.shuffle();
