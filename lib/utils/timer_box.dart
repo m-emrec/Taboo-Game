@@ -1,12 +1,9 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:taboo/logger.dart';
-import 'package:taboo/pages/end_screen.dart';
 import 'package:taboo/provider/game_provider.dart';
+import 'package:taboo/utils/change_team_pop_up.dart';
 
 class TimerBox extends StatefulWidget {
   const TimerBox({super.key});
@@ -17,20 +14,46 @@ class TimerBox extends StatefulWidget {
 
 class _TimerBoxState extends State<TimerBox> {
   late Timer _timer;
-  late int _remainingTime;
+  int _remainingTime = 0;
   late int _duration;
 
+  // This function starts the timer
   void _startTimer(int duration, DateTime startTime) {
+    setState(() {
+      _remainingTime = duration;
+    });
     _timer = Timer.periodic(
-      Duration(seconds: 1),
+      const Duration(seconds: 1),
       (timer) {
         var elapsedTime = DateTime.now().difference(startTime);
-
         setState(
           () {
-            _remainingTime = _duration - elapsedTime.inSeconds;
+            _remainingTime = _duration - elapsedTime.inSeconds ;
           },
         );
+        // if remaining time is 0 cancel the time and show @ChangeTeamPopUp
+        if (_remainingTime == 0) {
+          timer.cancel();
+
+          showDialog(
+            context: context,
+            builder: (_) => const ChangeTeamPopUp(),
+          ).then(
+            // here @ChangeTeamPopUp sends back a boolean value to this widget when it's popped
+            //if the value is null timer will be started again.
+            // if it's not true then timer will be canceled.
+            (arg) {
+              if (arg ?? false) {
+                _timer.cancel();
+              } else {
+                _startTimer(
+                  duration,
+                  DateTime.now(),
+                );
+              }
+            },
+          );
+        }
       },
     );
   }
@@ -40,12 +63,13 @@ class _TimerBoxState extends State<TimerBox> {
     super.initState();
     final DateTime startTime = DateTime.now();
     _duration = Provider.of<Game>(context, listen: false).gameDuration;
-    _remainingTime = _duration;
+
     _startTimer(_duration, startTime);
   }
 
   @override
   void dispose() {
+    // When this widget removed from the Tree stop @timer
     _timer.cancel();
     super.dispose();
   }
@@ -57,6 +81,7 @@ class _TimerBoxState extends State<TimerBox> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            //Timer Bar
             Container(
               height: 20,
               width: MediaQuery.of(context).size.width,
@@ -72,11 +97,12 @@ class _TimerBoxState extends State<TimerBox> {
                 ),
               ),
             ),
+            // Timer Text
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
               child: Material(
                 elevation: 5,
-                shape: CircleBorder(),
+                shape: const CircleBorder(),
                 child: CircleAvatar(
                   backgroundColor: Theme.of(context).cardColor,
                   foregroundColor: Colors.white,
@@ -84,12 +110,12 @@ class _TimerBoxState extends State<TimerBox> {
                   child: FittedBox(
                     child: Row(
                       children: [
-                        Icon(Icons.timer_outlined),
+                        const Icon(Icons.timer_outlined),
                         Padding(
-                          padding: const EdgeInsets.all(1.0),
+                          padding: const EdgeInsets.all(2.0),
                           child: Text(
                             "$_remainingTime",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],

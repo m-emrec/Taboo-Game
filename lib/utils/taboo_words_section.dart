@@ -2,31 +2,34 @@
 
 import 'package:flutter/material.dart';
 
+/*
+  - a ListView of the taboo words.
+*/
+
 class TabooWordsSection extends StatelessWidget {
   const TabooWordsSection({
     super.key,
+    required this.tabooWords,
   });
 
+  final List<String> tabooWords;
   @override
   Widget build(BuildContext context) {
-    final List dummy = [
-      "Taboo Word 1",
-      "Taboo Word 2",
-      "Taboo Word 3",
-      "Taboo Word 4",
-    ];
     return ListView(
+      
         shrinkWrap: true,
         padding: const EdgeInsets.all(8),
-        children: dummy
+        children: tabooWords
             .map(
-              (e) => Padding(
+              (tabooWord) => Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Text(
-                  e,
+                  tabooWord,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),

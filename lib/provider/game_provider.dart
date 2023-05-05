@@ -5,8 +5,10 @@ import 'package:taboo/logger.dart';
 
 class Game extends ChangeNotifier {
   //----------------------------------- Variables
-  final Duration _gameDuration = const Duration(seconds: 5);
+  Duration _gameDuration = const Duration(seconds: 120);
 
+  int _numberOfRounds = 4;
+  int _numberOfPass = 3;
   final List<Map> _words = [
     {
       "word": "Kitap",
@@ -108,19 +110,76 @@ class Game extends ChangeNotifier {
   */
   List<Map> _teamList = [];
 
-  late final int _teamCount;
+  late List<Map> shuffledList;
 
+  late Map _currentTeam;
+  int _teamIndex = 0;
+  int _roundIndex = 1;
+  bool _endOfGame = false;
   //------------ end of varibales area
 
   //----------------- getters
 
   int get gameDuration => _gameDuration.inSeconds;
   List<Map> get teamList => _teamList;
-  List<Map> get words => _words;
-
+  List<Map> get words => shuffledList;
+  Map get currentTeam => _currentTeam;
+  int get numberOfRounds => _numberOfRounds;
+  int get numberOfPass => _numberOfPass;
+  int get roundIndex => _roundIndex;
+  bool get endOfGame => _endOfGame;
+  int get teamIndex => _teamIndex;
   //------------------- end of getters
 
-  // ------------- functions
+//* ------------- functions
+
+  void startGame() {
+    _endOfGame = false;
+    shuffledList = _words;
+    shuffledList.shuffle();
+    _teamIndex = 0;
+    _roundIndex = 1;
+    for (var team in _teamList) {
+      team["pass"] = _numberOfPass;
+    }
+    _currentTeam = _teamList[_teamIndex];
+    notifyListeners();
+  }
+
+  void nextRound() {
+    if (roundIndex == numberOfRounds && teamIndex == teamList.length - 1) {
+      logger.wtf("End");
+      _endOfGame = true;
+      notifyListeners();
+    } else {
+      _teamIndex = 0;
+      _currentTeam = _teamList[_teamIndex];
+      _roundIndex++;
+      notifyListeners();
+    }
+  }
+
+  void changeTeam() {
+    if (_teamIndex < _teamList.length - 1) {
+      _teamIndex++;
+      _currentTeam = _teamList[_teamIndex];
+      notifyListeners();
+    } else {
+      nextRound();
+    }
+  }
+
+  void setGameDuration(int val) {
+    _gameDuration = Duration(seconds: val);
+  }
+
+  void setNumberOfPass(int val) {
+    _numberOfPass = val;
+  }
+
+  void setNumberOfRounds(int val) {
+    _numberOfRounds = val;
+  }
 
   void addTeam(String teamName) {
     _teamList.add(
@@ -129,7 +188,6 @@ class Game extends ChangeNotifier {
         "teamScore": 0,
       },
     );
-    logger.i(_teamList);
   }
 
   void resetGame() {
@@ -140,15 +198,18 @@ class Game extends ChangeNotifier {
     _words.shuffle();
   }
 
-  void increaseScore(String teamName) {
-    Map team =
-        _teamList.where((element) => element["teamName"] == teamName).first;
+  void increaseScore(Map team) {
     team["teamScore"] += 1;
+    notifyListeners();
   }
 
-  void decreaseScore(String teamName) {
-    Map team =
-        _teamList.where((element) => element["teamName"] == teamName).first;
+  void decreaseScore(Map team) {
     team["teamScore"] -= 1;
+    notifyListeners();
+  }
+
+  void usePass(Map team) {
+    team["pass"]--;
+    notifyListeners();
   }
 }

@@ -1,9 +1,10 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, unused_local_variable, prefer_const_constructors
-
 import 'package:flutter/material.dart';
-import 'package:taboo/utils/settings_sheet.dart';
+import 'package:provider/provider.dart';
+import 'package:taboo/utils/score_card.dart';
 import 'package:taboo/utils/timer_box.dart';
 
+import '../provider/game_provider.dart';
+import '../utils/game_buttons_row.dart';
 import '../utils/words_card.dart';
 
 class GamePage extends StatelessWidget {
@@ -16,36 +17,52 @@ class GamePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
 
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Team Name"),
+          title: Consumer<Game>(
+            builder: (context, game, child) => Text("${game.roundIndex}.Tur"),
+          ),
           centerTitle: true,
           foregroundColor: Colors.deepPurple.shade900,
         ),
         body: Stack(
           children: [
-            Positioned(
+            // Timer
+            const Positioned(
               top: 5,
               child: TimerBox(),
             ),
-            PageView.builder(
-              controller: controller,
-              itemBuilder: (context, index) => Stack(
-                children: [
-                  Center(
-                    child: SizedBox(
-                      width: screenWidth * 0.9,
-                      child: WordsCard(),
+            // Score card
+            const Positioned(
+              top: 25,
+              child: ScoreCard(),
+            ),
+            
+            Consumer<Game>(
+              builder: (context, game, child) => PageView.builder(
+                itemCount: game.shuffledList.length,
+                physics: const NeverScrollableScrollPhysics(),
+                controller: controller,
+                itemBuilder: (context, index) => Stack(
+                  children: [
+                    // Word and Taboo words
+                    Center(
+                      child: SizedBox(
+                        width: screenWidth * 0.8,
+                        child: WordsCard(
+                          wordData: game.shuffledList[index],
+                        ),
+                      ),
                     ),
-                  ),
-                  GameButtonsRow(
-                    screenWidth: screenWidth,
-                    controller: controller,
-                  ),
-                ],
+                    // Tabu | Pas | Doğru Buttons
+                    GameButtonsRow(
+                      screenWidth: screenWidth,
+                      controller: controller,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -55,57 +72,4 @@ class GamePage extends StatelessWidget {
   }
 }
 
-class GameButtonsRow extends StatelessWidget {
-  const GameButtonsRow({
-    super.key,
-    required this.screenWidth,
-    required this.controller,
-  });
 
-  final PageController controller;
-  final double screenWidth;
-
-  @override
-  Widget build(BuildContext context) {
-    final Duration animationDuration = Duration(milliseconds: 500);
-    const Curve animationCurve = Curves.decelerate;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            // Taboo button
-            SizedBox(
-              width: screenWidth * 0.3,
-              child: ElevatedButton(
-                onPressed: () => controller.nextPage(
-                    duration: animationDuration, curve: animationCurve),
-                child: Text("Tabu"),
-              ),
-            ),
-
-            // Pass button
-            SizedBox(
-              width: screenWidth * 0.3,
-              child: ElevatedButton(
-                onPressed: () => {},
-                child: Text("Pas"),
-              ),
-            ),
-
-            // Correct button
-            SizedBox(
-              width: screenWidth * 0.3,
-              child: ElevatedButton(
-                onPressed: () => {},
-                child: Text("Doğru"),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

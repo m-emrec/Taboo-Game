@@ -1,103 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:taboo/pages/game_page.dart';
+
+import '../provider/game_provider.dart';
+import 'custom_slider.dart';
+
+/*
+  - Players can set the Duration of one round , number of rounds and number of pass.
+*/
 
 class GameSettings extends StatelessWidget {
   const GameSettings({super.key});
 
-  // Oyun Süresi | Pas hakkı | Tur Sayısı
-
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<Game>(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SettingSlider(
+        // game duration
+        CustomSlider(
           minMalue: 60,
           maxValue: 180,
-          value: 60,
+          value: provider.gameDuration.toDouble(),
           title: "Oyun Süresi",
           division: 4,
+          func: provider.setGameDuration,
         ),
-        SettingSlider(
+        // Number of round
+        CustomSlider(
           title: "Tur Sayısı",
           minMalue: 2,
           maxValue: 10,
-          value: 4,
+          value: provider.numberOfRounds.toDouble(),
           division: 4,
+          func: provider.setNumberOfRounds,
         ),
-        SettingSlider(
+        // PAss
+        CustomSlider(
           maxValue: 5,
-          value: 3,
+          value: provider.numberOfPass.toDouble(),
           title: "Pas Hakkı",
           division: 5,
+          func: provider.setNumberOfPass,
         ),
+
         // Start game button
         SizedBox(
           width: double.infinity,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Provider.of<Game>(context, listen: false).startGame();
+                Navigator.of(context).pushReplacementNamed(GamePage.routeName);
+              },
               child: const Text("Başla"),
             ),
           ),
         )
       ],
-    );
-  }
-}
-
-class SettingSlider extends StatefulWidget {
-  SettingSlider({
-    super.key,
-    required this.value,
-    required this.title,
-    required this.maxValue,
-    required this.division,
-    this.minMalue = 0,
-  });
-
-  double value;
-  final double maxValue;
-  final String title;
-  final int division;
-  final double minMalue;
-  @override
-  State<SettingSlider> createState() => _SettingSliderState();
-}
-
-class _SettingSliderState extends State<SettingSlider> {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          // Title of slider
-          Text(
-            widget.title,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-          //Slider
-          Slider(
-            value: widget.value,
-            onChanged: (newValue) => setState(
-              () {
-                widget.value = newValue;
-              },
-            ),
-            max: widget.maxValue,
-            min: widget.minMalue,
-            divisions: widget.division,
-            label: "${widget.value}",
-          ),
-          // Value text
-          Text(
-            widget.value.toString(),
-            style: const TextStyle(color: Colors.white),
-          ),
-        
-        ],
-      ),
     );
   }
 }

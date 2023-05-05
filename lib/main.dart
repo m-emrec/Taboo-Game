@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => Game(),
       builder: (context, child) => MaterialApp(
+        
         debugShowCheckedModeBanner: false,
         title: 'Taboo',
         theme: appTheme,

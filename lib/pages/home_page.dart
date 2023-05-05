@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:taboo/pages/game_page.dart';
+import 'package:taboo/utils/change_team_pop_up.dart';
 import 'package:taboo/utils/start_game_sheet.dart';
 
 import '../utils/settings_sheet.dart';
@@ -18,57 +18,69 @@ class HomePage extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            // Menu
+            // Menu Card
             Center(
               child: SizedBox(
                 width: screenWidth * 0.8,
                 height: screenHeight * 0.4,
                 child: Card(
                   elevation: 5,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      // Menu title
-                      Column(
-                        children: [
-                          Text(
-                            "Menü",
-                            style: Theme.of(context).textTheme.titleLarge,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        // Menu title
+                        Column(
+                          children: [
+                            Text(
+                              "Menü",
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            Divider(
+                              indent: 8,
+                              endIndent: 8,
+                              thickness: 3,
+                              color: Theme.of(context).primaryColor,
+                            )
+                          ],
+                        ),
+                  
+                        // Start button
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: screenWidth * 0.6,
+                                child: ElevatedButton(
+                                  onPressed: () => showModalBottomSheet(
+                                    backgroundColor: Colors.transparent,
+                                    context: context,
+                                    builder: (_) => StartGameSheet(),
+                                  ),
+                                  child: const Text("Oyunu Başlat"),
+                                ),
+                              ),
+                            ],
                           ),
-                          Divider(
-                            indent: 8,
-                            endIndent: 8,
-                            thickness: 3,
-                            color: Theme.of(context).primaryColor,
-                          )
-                        ],
-                      ),
-
-                      // Start button
-                      SizedBox(
-                        width: screenWidth * 0.6,
-                        child: ElevatedButton(
-                          onPressed: () => showModalBottomSheet(
-                              backgroundColor: Colors.transparent,
-                              context: context,
-                              builder: (_) => StartGameSheet()),
-                          child: const Text("Başla"),
                         ),
-                      ),
-
-                      // Settings button
-                      SizedBox(
-                        width: screenWidth * 0.6,
-                        child: ElevatedButton(
-                          onPressed: () => showModalBottomSheet(
-                              backgroundColor: Colors.transparent,
-                              context: context,
-                              builder: (_) => const SettingSheet()),
-                          child: const Text("Ayarlar"),
-                        ),
-                      ),
-                    ],
+                  
+                        // // Settings button
+                        // SizedBox(
+                        //   width: screenWidth * 0.6,
+                        //   child: ElevatedButton(
+                        //     onPressed: () => showModalBottomSheet(
+                        //       backgroundColor: Colors.transparent,
+                        //       context: context,
+                        //       builder: (_) => const SettingSheet(),
+                        //     ),
+                        //     child: const Text("Ayarlar"),
+                        //   ),
+                        // ),
+                      ],
+                    ),
                   ),
                 ),
               ),

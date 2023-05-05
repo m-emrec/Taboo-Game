@@ -3,6 +3,12 @@ import 'package:provider/provider.dart';
 
 import '../provider/game_provider.dart';
 
+// * Definition
+/*
+  This widget used for adding new teams.
+  it contains TextFields , @addTeam button and a continue button which controls the PageController.
+*/
+
 class AddTeam extends StatefulWidget {
   const AddTeam({super.key, required this.pageController});
 
@@ -13,16 +19,18 @@ class AddTeam extends StatefulWidget {
 }
 
 class _AddTeamState extends State<AddTeam> {
-
   @override
   void initState() {
     super.initState();
-    Provider.of<Game>(context,listen: false).resetGame();
+    // when initialized reset the game.
+    Provider.of<Game>(context, listen: false).resetGame();
   }
 
 //* Variables
-  final List<TextField> _teamNameTextFieldList = [];
-  int inputIndex = 0;
+
+  final List<TextField> _teamNameTextFieldList =
+      []; // the list that holds the TextField widgets.
+  int inputIndex = 0; // I use this variable to track how many TextField I have.
 
 //* Widget Functions
 
@@ -44,14 +52,26 @@ class _AddTeamState extends State<AddTeam> {
     Key _key = UniqueKey();
     return TextField(
       key: _key,
+      controller: TextEditingController(),
+      cursorColor: Colors.deepPurple.shade900,
+      keyboardType: TextInputType.name,
+      maxLength: 15,
+      style: TextStyle(
+        color: Colors.deepPurple.shade900,
+        fontWeight: FontWeight.w600,
+      ),
       decoration: InputDecoration(
-        label: const Text("Takım İsmi"),
+        label: const Text(
+          "Takım İsmi",
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         suffix: CloseButton(
           color: Colors.deepPurple.shade500,
           onPressed: () => _removeInputField(_key),
         ),
       ),
-      controller: TextEditingController(),
     );
   }
 
@@ -59,6 +79,7 @@ class _AddTeamState extends State<AddTeam> {
 
   // removes the input field from the list.
   void _removeInputField(Key key) {
+    // this fucntion used for removing the textField.
     setState(
       () {
         _teamNameTextFieldList.removeWhere((element) => element.key == key);
@@ -80,8 +101,8 @@ class _AddTeamState extends State<AddTeam> {
         },
       );
     } else {
-      // if it's not empty
-      // Check if the TextField is emty or not . İf it is empty then prevent the user adding a new TextField and show a Sncakbar.
+      // if team name list is not empty
+      // Check if the TextField's value is empty or not . İf it is empty then prevent the user adding a new TextField and show a Sncakbar.
       // if it's not empty then add new TextField to the list
       if (_teamNameTextFieldList[inputIndex - 1].controller!.text.isNotEmpty) {
         setState(
@@ -93,10 +114,11 @@ class _AddTeamState extends State<AddTeam> {
             inputIndex++;
           },
         );
-      } //if
-      else {
-        const SnackBar snackBar =
-            SnackBar(content: Text("Takım İsmi Boş Olamaz !"));
+      } else {
+        // TextField's value is empty.
+        const SnackBar snackBar = SnackBar(
+          content: Text("Takım İsmi Boş Olamaz !"),
+        );
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       } // else
     } // else
@@ -127,46 +149,51 @@ class _AddTeamState extends State<AddTeam> {
                   horizontal: 24,
                 ),
                 child: SizedBox(
-                  height: 50,
+                  height: 80,
                   child: textField,
                 ),
               );
             },
           ),
 
-          // Add Team button
-          button(
-            onPressed: () {
-              // if there is less than 4 TextField add new one.
-              if (inputIndex < 4) {
-                _addInputField();
-              } else {
-                const SnackBar snackBar = SnackBar(
-                  content: Text("En Fazla 4 Takım Olabilir !"),
-                );
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              }
-            },
-            child: const Text("Takım Ekle"),
-            screenWidth: screenWidth,
-          ),
-          // Continue Button
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Visibility(
-              // if there is 2 or more Team then show Continue Button
-              visible: inputIndex > 1,
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: Consumer<Game>(
-                  builder: (context, game, child) => button(
-                    screenWidth: screenWidth * 0.5,
-                    onPressed: () => addTeam(game.addTeam),
-                    child: const Text("Devam"),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Add Team button
+              button(
+                onPressed: () {
+                  // if there is less than 4 TextField add new one.
+                  if (inputIndex < 4) {
+                    _addInputField();
+                  } else {
+                    const SnackBar snackBar = SnackBar(
+                      content: Text("En Fazla 4 Takım Olabilir !"),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
+                },
+                child: const Text("Takım Ekle"),
+                screenWidth: screenWidth,
+              ),
+              // Continue Button
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Visibility(
+                  // if there is 2 or more Team then show Continue Button
+                  visible: inputIndex > 1 && _teamNameTextFieldList[inputIndex - 1].controller!.text.isNotEmpty,
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Consumer<Game>(
+                      builder: (context, game, child) => button(
+                        screenWidth: screenWidth * 0.5,
+                        onPressed: () => addTeam(game.addTeam),
+                        child: const Text("Devam"),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           )
         ],
       ),
